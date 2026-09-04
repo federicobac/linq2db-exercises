@@ -10,6 +10,7 @@ var options = new DataOptions().UseSQLite("Data Source=dev.db");
 builder.Services.AddSingleton(new DataOptions<GroceryDatabase>(options));
 builder.Services.AddScoped<GroceryDatabase>();
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ProblemExceptionHandler>();
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOpenApiDocument();
@@ -21,24 +22,7 @@ using (var scope = app.Services.CreateScope())
     GrocerySeed.EnsureSeeded(db);
 }
 
-app.UseExceptionHandler(handler => handler.Run(async context =>
-{
-    var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
-    context.Response.StatusCode = error switch
-    {
-        ValidationException => StatusCodes.Status400BadRequest,
-        NotFoundException => StatusCodes.Status404NotFound,
-        ConflictException => StatusCodes.Status409Conflict,
-        NotImplementedException => StatusCodes.Status501NotImplemented,
-        _ => StatusCodes.Status500InternalServerError
-    };
-    await context.Response.WriteAsJsonAsync(new ProblemDetails
-    {
-        Status = context.Response.StatusCode,
-        Title = error?.GetType().Name,
-        Detail = error?.Message
-    });
-}));
+app.UseExceptionHandler();
 app.UseOpenApi();
 app.UseSwaggerUi();
 app.MapControllers();
