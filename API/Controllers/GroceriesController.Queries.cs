@@ -888,7 +888,39 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(GetSorted))]
     public List<GroceryItem> GetSorted([FromQuery] GrocerySort by, [FromQuery] bool descending = false)
     {
-        throw new NotImplementedException();
+        //1. Validation rules
+        
+        //2. Construct IQueryable<T> object
+        var q = db.Groceries().AsQueryable();
+        
+        //3. Apply filtering logic
+        
+        //4. Sorting
+        switch (by)
+        {
+            case GrocerySort.Name:
+                q = q.OrderBy(g => g.Name);
+                break;
+            case GrocerySort.Price:
+                q = q.OrderBy(g => g.PriceDkk);
+                break;
+            case GrocerySort.Stock:
+                q = descending
+                    ? q.OrderByDescending(g => g.StockCount)
+                    : q.OrderBy(g => g.StockCount);
+                break;
+            case GrocerySort.Rating:
+                q = q.OrderBy(g => g.RatingAvg);
+                break;
+            case GrocerySort.Created:
+                q = q.OrderBy(g => g.CreatedAtUtc);
+                break;
+        }
+        
+        //5. Projection
+        
+        //6. Return statement
+        return q.ToList();
     }
 
     #region Tests: GetSorted
@@ -925,7 +957,19 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(GetAveragePrice))]
     public decimal GetAveragePrice()
     {
-        throw new NotImplementedException();
+        //1. Validation rules
+
+        //2. Construct IQueryable<T> object
+        var q = db.Groceries().AsQueryable();
+
+        //3. Apply filtering logic
+
+        //4. Sorting
+
+        //5. Projection
+
+        //6. Return statement
+        return q.Average(g => g.PriceDkk);
     }
 
     #region Tests: GetAveragePrice
@@ -955,7 +999,19 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(GetTotalStockValue))]
     public decimal GetTotalStockValue()
     {
-        throw new NotImplementedException();
+        //1. Validation rules
+
+        //2. Construct IQueryable<T> object
+        var q = db.Groceries().AsQueryable();
+
+        //3. Apply filtering logic
+
+        //4. Sorting
+
+        //5. Projection
+
+        //6. Return statement
+        return q.Sum(g => g.PriceDkk * g.StockCount);
     }
 
     #region Tests: GetTotalStockValue
@@ -987,7 +1043,19 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(GetAverageRating))]
     public double? GetAverageRating()
     {
-        throw new NotImplementedException();
+        //1. Validation rules
+
+        //2. Construct IQueryable<T> object
+        var q = db.Groceries().AsQueryable();
+
+        //3. Apply filtering logic
+
+        //4. Sorting
+
+        //5. Projection
+
+        //6. Return statement
+        return q.Average(g => g.RatingAvg);
     }
 
     #region Tests: GetAverageRating
