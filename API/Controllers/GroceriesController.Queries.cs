@@ -370,7 +370,25 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(GetById))]
     public GroceryItem GetById([FromQuery] Guid id)
     {
-        throw new NotImplementedException();
+        //1. Validation rules
+        
+        //2. Construct IQueryable<T> object
+        var q = db.Groceries().AsQueryable();
+
+        //3. Apply filtering logic
+        q = q.Where(g => g.Id == id);
+        
+        //4. Sorting
+
+        //5. Projection
+
+        //6. Return statement
+        var item = q.FirstOrDefault();
+
+        if (item == null)
+            throw new NotFoundException("No row has that id");
+
+        return item;
     }
 
     #region Tests: GetById
@@ -563,7 +581,24 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(Search))]
     public List<GroceryItem> Search([FromQuery] string q)
     {
-        throw new NotImplementedException();
+        //1. Validation rules 
+        if(string.IsNullOrWhiteSpace(q) || q.Length < 2)
+            throw new ValidationException("Invalid query: insert at least 2 characters");
+        
+        //2. Construct IQueryable<T> object
+        var query = db.Groceries().AsQueryable();
+
+        //3. Apply filtering logic
+        query = query.Where(g => 
+            g.Name.ToLower().Contains(q.ToLower()) ||
+            (g.Brand != null && g.Brand.ToLower().Contains(q.ToLower())));
+
+        //4. Sorting
+        
+        //5. Projection
+        
+        //6. Return statement
+        return query.ToList();
     }
 
     #region Tests: Search
@@ -605,7 +640,22 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(GetCategories))]
     public List<string> GetCategories()
     {
-        throw new NotImplementedException();
+        //1. Validation rules 
+        
+        //2. Construct IQueryable<T> object
+        var q = db.Groceries()
+            .Select(g => g.Category);
+        
+        //3. Apply filtering logic
+        
+        //4. Sorting
+        q = q.Distinct();
+        q = q.OrderBy(category => category);
+        
+        //5. Projection
+        
+        //6. Return statement
+        return q.ToList();
     }
 
     #region Tests: GetCategories
@@ -631,7 +681,20 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(CountInCategory))]
     public int CountInCategory([FromQuery] string category)
     {
-        throw new NotImplementedException();
+        //1. Validation rules   
+
+        //2. Construct IQueryable<T> object
+        var q = db.Groceries().AsQueryable();
+
+        //3. Apply filtering logic
+        q = q.Where(g => g.Category == category);
+
+        //4. Sorting
+
+        //5. Projection
+
+        //6. Return statement
+        return q.Count();
     }
 
     #region Tests: CountInCategory
@@ -666,7 +729,20 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(CountByStorage))]
     public int CountByStorage([FromQuery] StorageType storage)
     {
-        throw new NotImplementedException();
+        //1. Validation rules
+        
+        //2. Construct IQueryable<T> object
+        var q = db.Groceries().AsQueryable();
+
+        //3. Apply filtering logic
+        q = q.Where(g => g.Storage == storage);
+        
+        //4. Sorting
+        
+        //5. Projection
+        
+        //6. Return statement
+        return q.Count();
     }
 
     #region Tests: CountByStorage
@@ -696,7 +772,22 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(GetTopPurchased))]
     public List<GroceryItem> GetTopPurchased([FromQuery] int n = 5)
     {
-        throw new NotImplementedException();
+        //1. Validation rules
+        if (n < 1 || n > 50)
+            throw new ValidationException("Number outside the range 1-50");
+        
+        //2. Construct IQueryable<T> object
+        var q = db.Groceries().AsQueryable();
+
+        //3. Apply filtering logic
+        //4. Sorting
+        q = q.OrderByDescending(g => g.TimesPurchased);
+        q = q.Take(n);
+        
+        //5. Projection
+        
+        //6. Return statement
+        return q.ToList();
     }
 
     #region Tests: GetTopPurchased
@@ -732,7 +823,24 @@ public partial class GroceriesController(GroceryDatabase db) : ControllerBase
     [HttpGet(nameof(GetPage))]
     public List<GroceryItem> GetPage([FromQuery] int page = 1, [FromQuery] int size = 10)
     {
-        throw new NotImplementedException();
+        //1. Validation rules
+        if (page < 1 || size < 1 || size > 100)
+            throw new ValidationException("Invalid page or size");
+
+        //2. Construct IQueryable<T> object
+        var q = db.Groceries().AsQueryable();
+
+        //3. Apply filtering logic
+
+        //4. Sorting
+        q = q.OrderBy(g => g.Name);
+        q = q.Skip((page - 1) * size);
+        q = q.Take(size);
+
+        //5. Projection
+
+        //6. Return statement
+        return q.ToList();
     }
 
     #region Tests: GetPage
