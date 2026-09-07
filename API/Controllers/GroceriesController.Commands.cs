@@ -17,7 +17,22 @@ public partial class GroceriesController
     [HttpPost(nameof(Discontinue))]
     public void Discontinue([FromQuery] Guid id)
     {
-        throw new NotImplementedException();
+        //1. Lookup
+        var item = db.Groceries().FirstOrDefault(g => g.Id == id);
+        
+        if (item == null)
+            throw new NotFoundException("No row has that id");
+        
+        //2. Validation rules
+        
+        //3. Replace property on existing object
+        item.IsDiscontinued = true;
+        
+        //4. Command
+        db.Update(item);
+
+        //5. Return statement (optional)
+
     }
 
     #region Tests: Discontinue
@@ -63,7 +78,22 @@ public partial class GroceriesController
     [HttpPost(nameof(Reactivate))]
     public void Reactivate([FromQuery] Guid id)
     {
-        throw new NotImplementedException();
+        //1. Lookup
+        var item = db.Groceries().FirstOrDefault(g => g.Id == id);
+        
+        if (item == null)
+            throw new NotFoundException("No row has that id");
+        
+        //2. Validation rules
+        
+        //3. Replace property on existing object
+        item.IsDiscontinued = true;
+        
+        //4. Command
+        db.Update(item);
+
+        //5. Return statement (optional)
+        
     }
 
     #region Tests: Reactivate
