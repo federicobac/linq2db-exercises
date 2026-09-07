@@ -270,7 +270,19 @@ public partial class GroceriesController
     [HttpDelete(nameof(DeleteExpired))]
     public int DeleteExpired()
     {
-        throw new NotImplementedException();
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        
+        //1. Validation rules
+        
+        //2. Lookup + 3. Command
+        var existing = db.Groceries()
+            .Where(g =>
+                g.StockCount == 0 &&
+                g.BestBefore < today)
+            .Delete();
+        
+        //4. Return statement
+        return existing;
     }
 
     #region Tests: DeleteExpired
