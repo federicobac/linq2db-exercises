@@ -79,18 +79,17 @@ public partial class GroceriesController
     public void Reactivate([FromQuery] Guid id)
     {
         //1. Lookup
-        var item = db.Groceries().FirstOrDefault(g => g.Id == id);
-        
-        if (item == null)
-            throw new NotFoundException("No row has that id");
+        var existing = db.
+            Groceries()
+            .FirstOrDefault(g => g.Id == id) ?? throw new NotFoundException("No row has that id");
         
         //2. Validation rules
         
         //3. Replace property on existing object
-        item.IsDiscontinued = true;
+        existing.IsDiscontinued = false;
         
         //4. Command
-        db.Update(item);
+        db.Update(existing);
 
         //5. Return statement (optional)
         
@@ -128,7 +127,25 @@ public partial class GroceriesController
     [HttpPost(nameof(Restock))]
     public int Restock([FromQuery] string category, [FromQuery] int amount)
     {
-        throw new NotImplementedException();
+        // 1. Validation rules
+        if (string.IsNullOrWhiteSpace(category))
+            throw new ValidationException("The category is blank");
+
+        if (amount < 1)
+            throw new ValidationException("Amount must be at least 1");
+
+        // 2. Lookup
+
+        // 3. Replace property
+
+        // 4. Command
+        var existing = db.Groceries()
+            .Where(g => g.Category == category && !g.IsDiscontinued)
+            .Set(g => g.StockCount, g => g.StockCount + amount)
+            .Update();
+
+        // 5. Return statement
+        return existing;
     }
 
     #region Tests: Restock
